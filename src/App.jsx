@@ -6,6 +6,8 @@ import Games from "./pages/Games";
 import GameDetail from "./pages/GameDetail";
 import NotFound from "./pages/NotFound";
 import TagGames from "./pages/TagGames";
+import Publishers from "./pages/Publishers";
+import PublisherDetail from "./pages/PublisherDetail";
 
 
 export default function App() {
@@ -18,6 +20,8 @@ export default function App() {
           <Route path="/games" element={<Games />} />
           <Route path="/game/:id" element={<GameDetail />} />
           <Route path="/tag/:slug" element={<TagGames />} />
+          <Route path="/publishers" element={<Publishers />} />
+          <Route path="/publisher/:id" element={<PublisherDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

@@ -2,10 +2,9 @@ import { Link, NavLink } from "react-router-dom";
 
 export default function Header() {
   const linkClass = ({ isActive }) =>
-    `px-3 py-2 rounded-xl text-sm font-semibold transition ${
-      isActive
-        ? "bg-gradient-to-r from-indigo-600 to-cyan-500 text-white shadow"
-        : "text-zinc-700 hover:bg-white/70"
+    `px-3 py-2 rounded-xl text-sm font-semibold transition ${isActive
+      ? "bg-gradient-to-r from-indigo-600 to-cyan-500 text-white shadow"
+      : "text-zinc-700 hover:bg-white/70"
     }`;
 
   return (
@@ -28,6 +27,7 @@ export default function Header() {
           <nav className="flex items-center gap-2">
             <NavLink to="/" className={linkClass}>Home</NavLink>
             <NavLink to="/games" className={linkClass}>Videojuegos</NavLink>
+            <NavLink to="/publishers" className={linkClass}>Publishers</NavLink>
           </nav>
         </div>
       </div>

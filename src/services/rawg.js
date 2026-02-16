@@ -16,29 +16,42 @@ async function request(endpoint) {
   return res.json();
 }
 
-// Juegos populares (ordenados por rating, puedes cambiarlo)
-export function getPopularGames(pageSize = 10) {
-  return request(`/games?ordering=-rating&page_size=${pageSize}`);
+export function getPopularGames(page = 1, pageSize = 20) {
+  return request(`/games?ordering=-rating&page=${page}&page_size=${pageSize}`);
 }
 
-// Buscar juegos por nombre
-export function searchGames(query, pageSize = 20) {
-  return request(`/games?search=${encodeURIComponent(query)}&page_size=${pageSize}`);
+export function searchGames(query, page = 1, pageSize = 20) {
+  return request(`/games?search=${encodeURIComponent(query)}&page=${page}&page_size=${pageSize}`);
 }
 
-// Detalle de un juego por ID
 export function getGameDetail(id) {
   return request(`/games/${id}`);
 }
 
-// Screenshots de un juego
 export function getGameScreenshots(id, pageSize = 12) {
   return request(`/games/${id}/screenshots?page_size=${pageSize}`);
 }
 
-// Juegos filtrados por TAG (slug)
 export function getGamesByTag(tagSlug, page = 1, pageSize = 20) {
   return request(
     `/games?tags=${encodeURIComponent(tagSlug)}&page=${page}&page_size=${pageSize}`
+  );
+}
+
+export function getPublishers(page = 1, pageSize = 20, search = "") {
+  let endpoint = `/publishers?page=${page}&page_size=${pageSize}`;
+  if (search) {
+    endpoint += `&search=${encodeURIComponent(search)}`;
+  }
+  return request(endpoint);
+}
+
+export function getPublisherDetail(id) {
+  return request(`/publishers/${id}`);
+}
+
+export function getPublisherGames(publisherId, page = 1, pageSize = 20) {
+  return request(
+    `/games?publishers=${publisherId}&page=${page}&page_size=${pageSize}`
   );
 }

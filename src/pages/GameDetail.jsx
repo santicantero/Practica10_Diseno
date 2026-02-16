@@ -48,18 +48,50 @@ export default function GameDetail() {
     };
   }, [id]);
 
-  const genresText = useMemo(() => {
+  const genresLinks = useMemo(() => {
     if (!game?.genres?.length) return "—";
-    return game.genres.map((g) => g.name).join(", ");
+    return (
+      <div className="flex flex-wrap gap-1">
+        {game.genres.map((g, i) => (
+          <span key={g.id}>
+            <Link
+              to={`/tag/${g.slug}`}
+              className="hover:text-indigo-600 hover:underline transition"
+            >
+              {g.name}
+            </Link>
+            {i < game.genres.length - 1 && ", "}
+          </span>
+        ))}
+      </div>
+    );
   }, [game]);
 
   const platformsText = useMemo(() => {
     if (!game?.platforms?.length) return "—";
     return game.platforms
-      .slice(0, 6)
       .map((p) => p.platform?.name)
       .filter(Boolean)
       .join(", ");
+  }, [game]);
+
+  const publishersLinks = useMemo(() => {
+    if (!game?.publishers?.length) return "—";
+    return (
+      <div className="flex flex-wrap gap-1">
+        {game.publishers.map((p, i) => (
+          <span key={p.id}>
+            <Link
+              to={`/publisher/${p.id}`}
+              className="hover:text-indigo-600 hover:underline transition"
+            >
+              {p.name}
+            </Link>
+            {i < game.publishers.length - 1 && ", "}
+          </span>
+        ))}
+      </div>
+    );
   }, [game]);
 
   const released = game?.released || "—";
@@ -75,7 +107,6 @@ export default function GameDetail() {
     setActiveShot(null);
   }
 
-  // cerrar modal con ESC
   useEffect(() => {
     function onKeyDown(e) {
       if (e.key === "Escape") closeModal();
@@ -117,7 +148,6 @@ export default function GameDetail() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16 pt-8">
-      {/* HERO */}
       <div className="relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-white/60 shadow-sm fade-up">
         <div className="relative h-[330px] sm:h-[420px]">
           <img
@@ -127,11 +157,9 @@ export default function GameDetail() {
             loading="lazy"
           />
 
-          {/* overlays */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
           <div className="absolute inset-0 bg-[radial-gradient(900px_320px_at_18%_18%,rgba(99,102,241,.55),transparent_60%)] opacity-80" />
 
-          {/* top bar */}
           <div className="absolute left-5 right-5 top-5 flex items-center justify-between gap-3">
             <Link
               to="/games"
@@ -143,15 +171,14 @@ export default function GameDetail() {
             <button
               onClick={onToggleFav}
               className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-extrabold shadow-sm transition ${fav
-                  ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                  : "bg-white/75 text-zinc-900 hover:bg-white"
+                ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                : "bg-white/75 text-zinc-900 hover:bg-white"
                 }`}
             >
               {fav ? "★ En favoritos" : "☆ Añadir a favoritos"}
             </button>
           </div>
 
-          {/* hero content */}
           <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
@@ -202,23 +229,20 @@ export default function GameDetail() {
         </div>
       </div>
 
-      {/* CONTENT */}
       <div className="mt-6 grid gap-5 lg:grid-cols-3">
-        {/* left */}
         <div className="lg:col-span-2 space-y-5">
-          {/* Details */}
           <div className="rounded-3xl border border-zinc-200/70 bg-white/70 backdrop-blur shadow-sm p-6 fade-up">
             <h2 className="text-lg font-extrabold text-zinc-900">Detalles</h2>
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <Info label="Géneros" value={genresText} />
+              <Info label="Géneros" value={genresLinks} />
               <Info label="Plataformas" value={platformsText} />
+              <Info label="Publishers" value={publishersLinks} />
               <Info label="Lanzamiento" value={released} />
               <Info label="Rating" value={rating} />
             </div>
           </div>
 
-          {/* Screenshots */}
           <div className="rounded-3xl border border-zinc-200/70 bg-white/70 backdrop-blur shadow-sm p-6 fade-up">
             <div className="flex items-end justify-between gap-3">
               <div>
@@ -273,7 +297,6 @@ export default function GameDetail() {
             )}
           </div>
 
-          {/* Description */}
           <div className="rounded-3xl border border-zinc-200/70 bg-white/70 backdrop-blur shadow-sm p-6 fade-up">
             <h2 className="text-lg font-extrabold text-zinc-900">Descripción</h2>
             <p className="mt-3 text-sm leading-7 text-zinc-700">
@@ -282,9 +305,7 @@ export default function GameDetail() {
           </div>
         </div>
 
-        {/* right */}
         <div className="space-y-5">
-          {/* Quick actions */}
           <div className="rounded-3xl border border-zinc-200/70 bg-white/70 backdrop-blur shadow-sm p-6 fade-up">
             <h3 className="text-sm font-extrabold text-zinc-900">
               Acciones rápidas
@@ -301,8 +322,8 @@ export default function GameDetail() {
               <button
                 onClick={onToggleFav}
                 className={`rounded-2xl px-4 py-3 text-sm font-extrabold transition ${fav
-                    ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                    : "bg-white border border-zinc-200 text-zinc-900 hover:bg-zinc-50"
+                  ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                  : "bg-white border border-zinc-200 text-zinc-900 hover:bg-zinc-50"
                   }`}
               >
                 {fav ? "Quitar de favoritos" : "Añadir a favoritos"}
@@ -314,7 +335,6 @@ export default function GameDetail() {
             </div>
           </div>
 
-          {/* Cover */}
           <div className="rounded-3xl overflow-hidden border border-zinc-200/70 bg-white/70 backdrop-blur shadow-sm fade-up">
             <div className="p-4">
               <div className="text-sm font-extrabold text-zinc-900">Portada</div>
@@ -330,7 +350,6 @@ export default function GameDetail() {
         </div>
       </div>
 
-      {/* Back */}
       <div className="mt-8">
         <Link
           to="/games"
@@ -340,7 +359,6 @@ export default function GameDetail() {
         </Link>
       </div>
 
-      {/* LIGHTBOX */}
       {activeShot && (
         <div
           className="fixed inset-0 z-50 bg-black/70 p-4 sm:p-8 flex items-center justify-center fade-in"
