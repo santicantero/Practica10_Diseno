@@ -55,7 +55,7 @@ export default function GameDetail() {
         {game.genres.map((g, i) => (
           <span key={g.id}>
             <Link
-              to={`/tag/${g.slug}`}
+              to={`/genre/${g.id}`}
               className="hover:text-indigo-600 hover:underline transition"
             >
               {g.name}
@@ -88,6 +88,26 @@ export default function GameDetail() {
               {p.name}
             </Link>
             {i < game.publishers.length - 1 && ", "}
+          </span>
+        ))}
+      </div>
+    );
+  }, [game]);
+
+  const tagsLinks = useMemo(() => {
+    if (!game?.tags?.length) return "—";
+    return (
+      <div className="flex flex-wrap gap-1">
+        {game.tags.slice(0, 5).map((t, i) => (
+          <span key={t.id}>
+            <Link
+              to={`/tag/${t.slug}`}
+              className="hover:text-indigo-600 hover:underline transition"
+            >
+              {t.name}
+            </Link>
+            {i < Math.min(game.tags.length, 5) - 1 && ", "}
+            {i === 4 && game.tags.length > 5 && "..."}
           </span>
         ))}
       </div>
@@ -201,12 +221,13 @@ export default function GameDetail() {
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {(game.genres || []).slice(0, 6).map((g) => (
-                  <span
+                  <Link
                     key={g.id}
+                    to={`/genre/${g.id}`}
                     className="rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs font-bold text-white hover:bg-white/20 transition"
                   >
                     {g.name}
-                  </span>
+                  </Link>
                 ))}
               </div>
               {game?.tags?.length > 0 && (
@@ -238,6 +259,7 @@ export default function GameDetail() {
               <Info label="Géneros" value={genresLinks} />
               <Info label="Plataformas" value={platformsText} />
               <Info label="Publishers" value={publishersLinks} />
+              <Info label="Tags" value={tagsLinks} />
               <Info label="Lanzamiento" value={released} />
               <Info label="Rating" value={rating} />
             </div>

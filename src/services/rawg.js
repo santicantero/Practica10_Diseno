@@ -38,6 +38,16 @@ export function getGamesByTag(tagSlug, page = 1, pageSize = 20) {
   );
 }
 
+export function getGamesByGenre(genreSlug, page = 1, pageSize = 20) {
+  return request(
+    `/games?genres=${encodeURIComponent(genreSlug)}&page=${page}&page_size=${pageSize}`
+  );
+}
+
+export function getGenreDetail(id) {
+  return request(`/genres/${id}`);
+}
+
 export function getPublishers(page = 1, pageSize = 20, search = "") {
   let endpoint = `/publishers?page=${page}&page_size=${pageSize}`;
   if (search) {
