@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import GameCard from "../components/GameCard";
 import Pagination from "../components/Pagination";
-import { getPopularGames, searchGames } from "../services/rawg";
-import { filterFavoriteGames } from "../services/favorites";
+import { fetchGames } from "../redux/actions/gamesActions";
 
 export default function Games() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const dispatch = useDispatch();
 
   const page = parseInt(searchParams.get("page") || "1", 10);
   const queryParam = searchParams.get("search") || "";
 
-  const [games, setGames] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [onlyFavs, setOnlyFavs] = useState(false);
+  const { list: games, loading, error } = useSelector((state) => state.games);
+  const favoriteIds = useSelector((state) => state.user.favorites);
 
+  const [onlyFavs, setOnlyFavs] = useState(false);
   const [inputValue, setInputValue] = useState(queryParam);
 
   useEffect(() => {
@@ -23,35 +23,8 @@ export default function Games() {
   }, [queryParam]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      try {
-        setLoading(true);
-        setError("");
-
-        let data;
-        if (queryParam) {
-          data = await searchGames(queryParam, page, 24);
-        } else {
-          data = await getPopularGames(page, 20);
-        }
-
-        if (!cancelled) {
-          setGames(data.results || []);
-        }
-      } catch (err) {
-        if (!cancelled) setError(err.message || "Error cargando juegos");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [page, queryParam]);
+    dispatch(fetchGames(page, queryParam));
+  }, [page, queryParam, dispatch]);
 
   function handleSearch(e) {
     e.preventDefault();
@@ -79,7 +52,9 @@ export default function Games() {
     });
   }
 
-  const gamesToShow = onlyFavs ? filterFavoriteGames(games) : games;
+  const gamesToShow = onlyFavs
+    ? games.filter(g => favoriteIds.includes(Number(g.id)))
+    : games;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
