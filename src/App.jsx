@@ -9,6 +9,9 @@ import TagGames from "./pages/TagGames";
 import GenreGames from "./pages/GenreGames";
 import Publishers from "./pages/Publishers";
 import PublisherDetail from "./pages/PublisherDetail";
+import Events from "./pages/Events";
+import MyFavorites from "./pages/MyFavorites";
+import MyEvents from "./pages/MyEvents";
 
 
 export default function App() {
@@ -24,6 +27,9 @@ export default function App() {
           <Route path="/genre/:id" element={<GenreGames />} />
           <Route path="/publishers" element={<Publishers />} />
           <Route path="/publisher/:id" element={<PublisherDetail />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/my-favorites" element={<MyFavorites />} />
+          <Route path="/my-events" element={<MyEvents />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

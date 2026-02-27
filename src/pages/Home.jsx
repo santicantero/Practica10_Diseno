@@ -1,32 +1,18 @@
-import { useEffect, useState } from "react";
-import { getPopularGames } from "../services/rawg";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchGames } from "../redux/actions/gamesActions";
 import Carousel from "../components/Carousel";
 import GameCard from "../components/GameCard";
 
 export default function Home() {
-  const [games, setGames] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const { list: games, loading, error } = useSelector((state) => state.games);
 
   useEffect(() => {
-    let cancelled = false;
+    dispatch(fetchGames(1)); // Fetch first page for home
+  }, [dispatch]);
 
-    async function load() {
-      try {
-        setLoading(true);
-        setError("");
-        const data = await getPopularGames(16);
-        if (!cancelled) setGames(data.results || []);
-      } catch (err) {
-        if (!cancelled) setError(err.message || "Error cargando juegos");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    load();
-    return () => (cancelled = true);
-  }, []);
+  const displayedGames = games.slice(0, 16);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -98,7 +84,7 @@ export default function Home() {
           </div>
         )}
 
-        {!loading && !error && <Carousel items={games} />}
+        {!loading && !error && <Carousel items={displayedGames} />}
       </div>
 
       {/* Grid populares */}
@@ -121,7 +107,7 @@ export default function Home() {
           </div>
 
           <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {games.map((g) => (
+            {displayedGames.map((g) => (
               <GameCard key={g.id} game={g} />
             ))}
           </div>
