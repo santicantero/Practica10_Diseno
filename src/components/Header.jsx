@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 export default function Header() {
   const user = useSelector((state) => state.user.profile);
   const favoritesCount = useSelector((state) => state.user.favorites.length);
-  const myEventsCount = useSelector((state) => state.events.userEvents.length);
+  const myEventsCount = useSelector((state) => state.user.userEvents.length);
 
   const linkClass = ({ isActive }) =>
     `px-3 py-2 rounded-xl text-sm font-semibold transition ${isActive

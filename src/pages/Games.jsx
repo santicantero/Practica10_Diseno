@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import GameCard from "../components/GameCard";
 import Pagination from "../components/Pagination";
-import { fetchGames } from "../redux/actions/gamesActions";
+import { getPopularGames, searchGames } from "../services/rawg";
 
 export default function Games() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -12,7 +12,10 @@ export default function Games() {
   const page = parseInt(searchParams.get("page") || "1", 10);
   const queryParam = searchParams.get("search") || "";
 
-  const { list: games, loading, error } = useSelector((state) => state.games);
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const favoriteIds = useSelector((state) => state.user.favorites);
 
   const [onlyFavs, setOnlyFavs] = useState(false);
@@ -23,8 +26,22 @@ export default function Games() {
   }, [queryParam]);
 
   useEffect(() => {
-    dispatch(fetchGames(page, queryParam));
-  }, [page, queryParam, dispatch]);
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = queryParam
+          ? await searchGames(queryParam, page, 20)
+          : await getPopularGames(page, 20);
+        setGames(data.results || []);
+      } catch (err) {
+        setError(err.message || "Error al cargar los juegos");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [page, queryParam]);
 
   function handleSearch(e) {
     e.preventDefault();
