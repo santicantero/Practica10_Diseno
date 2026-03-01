@@ -1,14 +1,30 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loadEvents, toggleEventSignup } from "../redux/actions/eventsActions";
+import { toggleEventSignup } from "../redux/actions/userActions";
+import { fetchEvents } from "../services/eventsService";
 
 export default function Events() {
     const dispatch = useDispatch();
-    const { list: events, userEvents, loading, error } = useSelector((state) => state.events);
+    const [events, setEvents] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const userEvents = useSelector((state) => state.user.userEvents);
 
     useEffect(() => {
-        dispatch(loadEvents());
-    }, [dispatch]);
+        async function load() {
+            setLoading(true);
+            setError(null);
+            try {
+                const data = await fetchEvents();
+                setEvents(data || []);
+            } catch (err) {
+                setError(err.message || "Error al cargar eventos");
+            } finally {
+                setLoading(false);
+            }
+        }
+        load();
+    }, []);
 
     const isSignedUp = (id) => userEvents.includes(id);
 
@@ -82,8 +98,8 @@ export default function Events() {
                                         <button
                                             onClick={() => dispatch(toggleEventSignup(event.id))}
                                             className={`rounded-2xl px-6 py-2.5 text-sm font-bold transition-all duration-200 shadow-sm ${isSignedUp(event.id)
-                                                    ? "bg-red-50 text-red-600 hover:bg-red-100 border border-red-100"
-                                                    : "bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-indigo-200"
+                                                ? "bg-red-50 text-red-600 hover:bg-red-100 border border-red-100"
+                                                : "bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-indigo-200"
                                                 }`}
                                         >
                                             {isSignedUp(event.id) ? "Cancelar" : "Apuntarme"}

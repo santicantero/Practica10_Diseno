@@ -1,16 +1,28 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchGames } from "../redux/actions/gamesActions";
+import { useEffect, useState } from "react";
+import { getPopularGames } from "../services/rawg";
 import Carousel from "../components/Carousel";
 import GameCard from "../components/GameCard";
 
 export default function Home() {
-  const dispatch = useDispatch();
-  const { list: games, loading, error } = useSelector((state) => state.games);
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    dispatch(fetchGames(1)); // Fetch first page for home
-  }, [dispatch]);
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getPopularGames(1);
+        setGames(data.results || []);
+      } catch (err) {
+        setError(err.message || "Error al cargar populares");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   const displayedGames = games.slice(0, 16);
 

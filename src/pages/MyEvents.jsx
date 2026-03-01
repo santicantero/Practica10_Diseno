@@ -1,8 +1,30 @@
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchEvents } from "../services/eventsService";
+import { toggleEventSignup } from "../redux/actions/userActions";
 
 export default function MyEvents() {
-    const { list: events, userEvents } = useSelector((state) => state.events);
+    const dispatch = useDispatch();
+    const userEvents = useSelector((state) => state.user.userEvents);
+    const [events, setEvents] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        async function load() {
+            setLoading(true);
+            try {
+                const data = await fetchEvents();
+                setEvents(data || []);
+            } catch (err) {
+                console.error("Error loading events", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        load();
+    }, []);
+
     const myEvents = events.filter((e) => userEvents.includes(e.id));
 
     return (
@@ -18,7 +40,13 @@ export default function MyEvents() {
             </div>
 
             <div className="mt-10">
-                {myEvents.length > 0 ? (
+                {loading ? (
+                    <div className="space-y-4 animate-pulse">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="h-24 rounded-3xl bg-zinc-100" />
+                        ))}
+                    </div>
+                ) : myEvents.length > 0 ? (
                     <div className="space-y-4">
                         {myEvents.map((event) => (
                             <div key={event.id} className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-3xl border border-zinc-200 bg-white hover:border-cyan-200 transition">
@@ -29,7 +57,12 @@ export default function MyEvents() {
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <span className="rounded-full bg-cyan-50 px-4 py-1.5 text-[11px] font-black text-cyan-700 uppercase border border-cyan-100">Confirmado</span>
-                                    <Link to="/events" className="text-sm font-bold text-zinc-400 hover:text-red-500 transition">Gestionar</Link>
+                                    <button
+                                        onClick={() => dispatch(toggleEventSignup(event.id))}
+                                        className="text-sm font-bold text-zinc-400 hover:text-red-500 transition"
+                                    >
+                                        Cancelar
+                                    </button>
                                 </div>
                             </div>
                         ))}

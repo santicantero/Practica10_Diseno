@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { getGameDetail, getGameScreenshots } from "../services/rawg";
-import { isFavorite, toggleFavorite } from "../services/favorites";
+import { toggleFavorite } from "../redux/actions/userActions";
 
 export default function GameDetail() {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const favoriteIds = useSelector((state) => state.user.favorites);
+  const isFav = favoriteIds.includes(Number(id));
 
   const [game, setGame] = useState(null);
   const [shots, setShots] = useState([]);
@@ -13,7 +17,6 @@ export default function GameDetail() {
   const [loading, setLoading] = useState(true);
   const [loadingShots, setLoadingShots] = useState(true);
   const [error, setError] = useState("");
-  const [fav, setFav] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -29,7 +32,6 @@ export default function GameDetail() {
 
         if (!cancelled) {
           setGame(data);
-          setFav(isFavorite(data.id));
           setShots(shotsData?.results || []);
         }
       } catch (err) {
@@ -119,8 +121,7 @@ export default function GameDetail() {
 
   function onToggleFav() {
     if (!game) return;
-    const next = toggleFavorite(game.id);
-    setFav(next);
+    dispatch(toggleFavorite(game.id));
   }
 
   function closeModal() {
@@ -190,12 +191,12 @@ export default function GameDetail() {
 
             <button
               onClick={onToggleFav}
-              className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-extrabold shadow-sm transition ${fav
+              className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-extrabold shadow-sm transition ${isFav
                 ? "bg-indigo-600 text-white hover:bg-indigo-700"
                 : "bg-white/75 text-zinc-900 hover:bg-white"
                 }`}
             >
-              {fav ? "★ En favoritos" : "☆ Añadir a favoritos"}
+              {isFav ? "★ En favoritos" : "☆ Añadir a favoritos"}
             </button>
           </div>
 
@@ -343,12 +344,12 @@ export default function GameDetail() {
 
               <button
                 onClick={onToggleFav}
-                className={`rounded-2xl px-4 py-3 text-sm font-extrabold transition ${fav
+                className={`rounded-2xl px-4 py-3 text-sm font-extrabold transition ${isFav
                   ? "bg-indigo-600 text-white hover:bg-indigo-700"
                   : "bg-white border border-zinc-200 text-zinc-900 hover:bg-zinc-50"
                   }`}
               >
-                {fav ? "Quitar de favoritos" : "Añadir a favoritos"}
+                {isFav ? "Quitar de favoritos" : "Añadir a favoritos"}
               </button>
             </div>
 

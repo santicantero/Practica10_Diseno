@@ -1,5 +1,6 @@
 const initialState = {
     favorites: JSON.parse(localStorage.getItem('favorite_games_ids')) || [],
+    userEvents: JSON.parse(localStorage.getItem('user_events_ids')) || [],
     profile: {
         name: "Santi",
         avatar: "👤"
@@ -17,6 +18,17 @@ export default function userReducer(state = initialState, action) {
 
             localStorage.setItem('favorite_games_ids', JSON.stringify(updatedFavs));
             return { ...state, favorites: updatedFavs };
+
+        case 'TOGGLE_EVENT_SIGNUP':
+            const eventId = action.payload;
+            const isSignedUp = state.userEvents.includes(eventId);
+            const updatedEvents = isSignedUp
+                ? state.userEvents.filter(id => id !== eventId)
+                : [...state.userEvents, eventId];
+
+            localStorage.setItem('user_events_ids', JSON.stringify(updatedEvents));
+            return { ...state, userEvents: updatedEvents };
+
         default:
             return state;
     }
